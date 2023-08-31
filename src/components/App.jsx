@@ -9,9 +9,10 @@ export class App extends Component {
   state = {
     query: '',
     gallery: [],
-    page: 1,
+    page: 0,
     error: null,
     loading: false,
+    totalPages: 1,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -22,7 +23,11 @@ export class App extends Component {
       this.setState({ loading: true });
 
       fetchImages(this.state.query, this.state.page)
-        .then(({ hits }) => this.setState({ gallery: hits }))
+        .then(({ hits }) =>
+          this.setState(prevState => ({
+            gallery: [...prevState.gallery, ...hits],
+          }))
+        )
         .catch(error => this.setState({ error }))
         .finally(loading => this.setState({ loading: false }));
     }
@@ -34,6 +39,7 @@ export class App extends Component {
   handleLoadMoreClick = () => {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
+
   render() {
     return (
       <>
@@ -48,7 +54,9 @@ export class App extends Component {
           />
         )}
         <ImageGallery gallery={this.state.gallery} />
-        <Button handleLoadMoreClick={this.handleLoadMoreClick} />
+        {this.state.page >= this.state.totalPages && (
+          <Button handleLoadMoreClick={this.handleLoadMoreClick} />
+        )}
       </>
     );
   }
