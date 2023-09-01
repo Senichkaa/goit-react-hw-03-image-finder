@@ -15,6 +15,9 @@ export class App extends Component {
     loading: false,
     totalPages: 1,
     showModal: false,
+    largeImageURL: null,
+    tags: null,
+    totalImages: null,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -23,18 +26,28 @@ export class App extends Component {
       this.state.query !== prevState.query
     ) {
       this.setState({ loading: true });
-
+      // this.state.query.split('/');
       fetchImages(this.state.query, this.state.page)
         .then(({ hits }) =>
           this.setState(prevState => ({
             gallery: [...prevState.gallery, ...hits],
-            // totalPages: this.state.page < Math.ceil(totalHits / 12),
           }))
         )
         .catch(error => this.setState({ error }))
         .finally(loading => this.setState({ loading: false }));
     }
+
+    if (this.state.query !== prevState.query) {
+      this.setState({ loading: true });
+      fetchImages(this.state.query, this.state.page)
+        .then(({ hits, totalHits }) =>
+          this.setState({ gallery: hits, totalImages: totalHits })
+        )
+        .catch(error => this.setState({ error }))
+        .finally(loading => this.setState({ loading: false }));
+    }
   }
+
   handleSubmitSearch = query => {
     this.setState({ query, gallery: [], page: 1 });
   };
@@ -43,9 +56,11 @@ export class App extends Component {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
-  toggleModal = () => {
+  toggleModal = ({ largeImageURL, tags }) => {
     this.setState(({ showModal }) => ({
       showModal: !this.state.showModal,
+      largeImageURL,
+      tags,
     }));
   };
 
@@ -71,11 +86,18 @@ export class App extends Component {
             onImageClick={this.toggleModal}
           />
         )}
-        {this.state.gallery.length !== 0 && (
-          <Button handleLoadMoreClick={this.handleLoadMoreClick} />
-        )}
+        {this.state.gallery.length !== 0 &&
+          this.state.page < Math.ceil(this.state.totalImages / 12) && (
+            <Button handleLoadMoreClick={this.handleLoadMoreClick} />
+          )}
 
-        {this.state.showModal && <Modal onClose={this.toggleModal} />}
+        {this.state.showModal && (
+          <Modal
+            largeImageURL={this.state.largeImageURL}
+            tags={this.state.tags}
+            onClose={this.toggleModal}
+          />
+        )}
       </>
     );
   }
