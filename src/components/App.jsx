@@ -26,7 +26,6 @@ export class App extends Component {
       this.state.query !== prevState.query
     ) {
       this.setState({ loading: true });
-      // this.state.query.split('/');
       fetchImages(this.state.query, this.state.page)
         .then(({ hits }) =>
           this.setState(prevState => ({

@@ -6,6 +6,7 @@ import {
   SearchHeader,
   SearchButton,
 } from './Searchbar.styled';
+import { RiUserSearchLine } from 'react-icons/ri';
 
 export class Searchbar extends Component {
   state = {
@@ -32,7 +33,9 @@ export class Searchbar extends Component {
       <SearchHeader className="searchbar">
         <SearchbarForm className="form" onSubmit={this.handleSubmit}>
           <SearchButton type="submit" className="button">
-            <Label className="button-label">Search</Label>
+            <Label className="button-label">
+              <RiUserSearchLine size={28} />
+            </Label>
           </SearchButton>
 
           <SearchFormField
