@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { SearchbarForm } from './Searchbar.styled';
 
 export class Searchbar extends Component {
   state = {
@@ -8,7 +9,7 @@ export class Searchbar extends Component {
   handleSubmit = event => {
     event.preventDefault();
     if (this.state.query.trim() === '') {
-      alert('Enter a valid search query!');
+      return alert('Enter a valid search query!');
     }
     this.props.onSubmit(this.state.query);
     this.setState({
@@ -23,7 +24,7 @@ export class Searchbar extends Component {
   render() {
     return (
       <header className="searchbar">
-        <form className="form" onSubmit={this.handleSubmit}>
+        <SearchbarForm className="form" onSubmit={this.handleSubmit}>
           <button type="submit" className="button">
             <span className="button-label">Search</span>
           </button>
@@ -37,7 +38,7 @@ export class Searchbar extends Component {
             value={this.state.query}
             onChange={this.handleInput}
           />
-        </form>
+        </SearchbarForm>
       </header>
     );
   }

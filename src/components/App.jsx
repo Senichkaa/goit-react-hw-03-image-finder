@@ -4,6 +4,7 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { fetchImages } from './fetch-api.js';
 import { Button } from './Button/Button';
 import { RotatingLines } from 'react-loader-spinner';
+import { Modal } from './Modal/Modal';
 
 export class App extends Component {
   state = {
@@ -13,6 +14,7 @@ export class App extends Component {
     error: null,
     loading: false,
     totalPages: 1,
+    showModal: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -26,6 +28,7 @@ export class App extends Component {
         .then(({ hits }) =>
           this.setState(prevState => ({
             gallery: [...prevState.gallery, ...hits],
+            // totalPages: this.state.page < Math.ceil(totalHits / 12),
           }))
         )
         .catch(error => this.setState({ error }))
@@ -40,10 +43,19 @@ export class App extends Component {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !this.state.showModal,
+    }));
+  };
+
   render() {
     return (
       <>
         <Searchbar onSubmit={this.handleSubmitSearch} />
+        {!this.state.loading && this.state.error && (
+          <h1>Hold on! Something went wrong. Reboot a page, please.</h1>
+        )}
         {this.state.loading && (
           <RotatingLines
             strokeColor="grey"
@@ -53,10 +65,17 @@ export class App extends Component {
             visible={true}
           />
         )}
-        <ImageGallery gallery={this.state.gallery} />
-        {this.state.page >= this.state.totalPages && (
+        {this.state.gallery.length > 0 && (
+          <ImageGallery
+            gallery={this.state.gallery}
+            onImageClick={this.toggleModal}
+          />
+        )}
+        {this.state.gallery.length !== 0 && (
           <Button handleLoadMoreClick={this.handleLoadMoreClick} />
         )}
+
+        {this.state.showModal && <Modal onClose={this.toggleModal} />}
       </>
     );
   }
